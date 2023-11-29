@@ -1,0 +1,478 @@
+---
+title: "Cyclistic Capstone Project"
+author: "Marwa Rabia"
+date: "2023-11-27"
+output: pdf_document
+     # theme:
+     #   bootswatch: solar
+     #   bg: "#121212"
+     #   fg: "#E4E4E4"
+     #   base_font:
+     #   google: "Prompt"
+---
+## Introduction
+
+This is my Capstone Project for my Google Data Analytics Course. This project is based on an imaginary company called Cyclistic and all data related to the company has been provided in the course itself.
+
+## About the company
+
+![](H:\Courses\Coursera\Google Data Analytics Professional Certificate\Capstone project\download.png)
+
+In 2016, Cyclistic launched a successful bike-share offering. Since then, the program has grown to a fleet of 5,824 bicycles that are
+geotracked and locked into a network of 692 stations across Chicago. The bikes can be unlocked from one station and returned to
+any other station in the system anytime.
+
+Until now, Cyclistic’s marketing strategy relied on building general awareness and appealing to broad consumer segments. One
+approach that helped make these things possible was the flexibility of its pricing plans: single-ride passes, full-day passes, and
+annual memberships. Customers who purchase single-ride or full-day passes are referred to as casual riders. Customers who
+purchase annual memberships are Cyclistic members.
+
+Cyclistic’s finance analysts have concluded that annual members are much more profitable than casual riders. Although the pricing
+flexibility helps Cyclistic attract more customers, Moreno believes that maximizing the number of annual members will be key to
+future growth. Rather than creating a marketing campaign that targets all-new customers, Moreno believes there is a very good
+chance to convert casual riders into members. She notes that casual riders are already aware of the Cyclistic program and have
+chosen Cyclistic for their mobility needs.
+
+Moreno has set a clear goal: Design marketing strategies aimed at converting casual riders into annual members. In order to do
+that, however, the marketing analyst team needs to better understand how annual members and casual riders differ, why casual
+riders would buy a membership, and how digital media could affect their marketing tactics. Moreno and her team are interested in
+analyzing the Cyclistic historical bike trip data to identify trends.
+
+## Characters and teams
+
+* **Cyclistic:** A bike-share program that features more than 5,800 bicycles and 600 docking stations. Cyclistic sets itself apart
+by also offering reclining bikes, hand tricycles, and cargo bikes, making bike-share more inclusive to people with disabilities
+and riders who can’t use a standard two-wheeled bike. The majority of riders opt for traditional bikes; about 8% of riders use
+the assistive options. Cyclistic users are more likely to ride for leisure, but about 30% use them to commute to work each
+day.
+* **Lily Moreno:** The director of marketing and your manager. Moreno is responsible for the development of campaigns and
+initiatives to promote the bike-share program. These may include email, social media, and other channels.
+* **Cyclistic marketing analytics team:** A team of data analysts who are responsible for collecting, analyzing, and reporting
+data that helps guide Cyclistic marketing strategy. You joined this team six months ago and have been busy learning about
+Cyclistic’s mission and business goals — as well as how you, as a junior data analyst, can help Cyclistic achieve them.
+* **Cyclistic executive team:** The notoriously detail-oriented executive team will decide whether to approve the
+recommended marketing program.
+
+## Scenario
+
+Cyclistic, a fictional bike-sharing company situated in Chicago, Illinois, enlisted me as a data analyst to contribute insights to the marketing team's strategic initiatives. Within the customer base, Cyclistic caters to two primary segments: annual members and casual riders. The director of marketing recognizes the pivotal role of increasing annual memberships in ensuring the company's future success.
+
+Tasked with crafting a compelling strategy to convert casual riders into annual members, the marketing team seeks data-driven insights into the distinctive usage patterns of these two customer groups. Specifically, we aim to understand how casual riders and annual members differ in their utilization of Cyclistic bikes. In response to the director's directive, the focus of the proposed strategy will be on leveraging digital media channels, such as email, social media, and other online platforms, to effectively communicate and encourage the transition from casual riding to annual memberships.
+
+This Case Study will have 6 steps in total to find solutions to our required Business task. The 6 steps are: **Ask, Prepare, Process, Analyze, Share, Act.**
+
+### Step 1 Ask (Business Questions)
+
+The Goal of the Marketing director is to increase the number of annual memberships by converting more and more casual riders to increase profitability of the Company.
+
+1. How do annual members and casual riders use Cyclistic bikes differently?
+2. Why would casual riders buy Cyclistic annual memberships?
+3. How can Cyclistic use digital media to influence casual riders to become members?
+
+### Our Business Task:
+1. How do annual members and casual riders use Cyclistic bikes differently?
+
+### Step 2 : Preparing the Data
+
+#### Information About The Data
+* The company Cyclist is a fictional company; hence we are using data of a real world company to answer questions related to our business task.
+* The following datasets were provided in the case study only Data link: Divvy trip data public dataset
+* We have considered data for Months **January 2023 – June 2023.**
+
+####  Licensing, Privacy, Reliability
+* The data comes from a reliable source, without any bias as it is a real time data of a company which is from recent months.
+* This data stands secure in an AWS portal and is an open dataset.
+* The data has been made available by Motivate International Inc. under this license.
+
+#### Tools Used
+* I have used R Programming Language for the data cleaning and data processing phase.
+
+#### Setting up my environment
+
+```{r}
+library(tidyverse) 
+library(lubridate) 
+library(ggplot2) 
+library(janitor) 
+library(skimr) 
+library(dplyr) 
+```
+
+
+#### Loading .csv files
+
+```{r}
+m1_2023 <- read.csv('Data\\202301-divvy-tripdata.csv')
+m2_2023 <- read.csv('Data\\202302-divvy-tripdata.csv')
+m3_2023 <- read.csv('Data\\202303-divvy-tripdata.csv')
+m4_2023 <- read.csv('Data\\202304-divvy-tripdata.csv')
+m5_2023 <- read.csv('Data\\202305-divvy-tripdata.csv')
+m6_2023 <- read.csv('Data\\202306-divvy-tripdata.csv')
+```
+
+#### WRANGLE DATA AND COMBINE INTO A SINGLE FILE¶
+  Compare column names each of the files
+  
+```{r}
+all(colnames(m1_2023) == colnames(m2_2023)&
+    colnames(m1_2023) == colnames(m3_2023)&
+    colnames(m1_2023) == colnames(m4_2023)&
+    colnames(m1_2023) == colnames(m5_2023)&
+    colnames(m1_2023) == colnames(m6_2023)) 
+
+```
+  
+Since the column are consistent we can go ahead with the combining
+```{r}
+all_data <- bind_rows(m1_2023,m2_2023,m3_2023,m4_2023,m5_2023,m6_2023)
+```
+
+Save All data as CSV
+```{r}
+# write.csv(all_data, file = "Data_before_cleaning.csv", row.names = FALSE)
+```
+
+#### Understanding The Data
+```{r}
+head(all_data) # Checking the first few rows of the dataset
+```
+
+```{r}
+summary(all_data) # To Understand statistics about the Data set
+```
+
+```{r}
+colnames(all_data) #Column names of the Data set
+```
+
+```{r}
+skim_without_charts(all_data)   # 2387999 
+```
+
+
+```{r}
+glimpse(all_data) #Summary of the Data set and Data Types of Columns
+```
+
+#### Observations about the Data set
+* Total number of rows =	2,390,459 and columns = 13.
+* Each row represents a unique entry and there are no duplicate values.
+* There are 2 unique types of Customers and 3 unique types of bikes.
+
+
+#### Problems Noted
+* Columns having missing values : start_station_name, start_station_id, end_station_name, end_station_id, end_lat, end_lng.
+* Some Columns have to be renamed as they are not intuitive.
+* The data can only be aggregated at the ride-level. We will want to add some additional columns of data – such as day, month, year – that provide additional opportunities to aggregate the data.
+* We will add a column ride length to understand the amount of time that has been spent by a user in a particular ride.
+
+### Step 3 Processing the Data
+
+#### Data Manipulation
+
+#### Renaming Column
+
+```{r}
+all_data <- rename(all_data, "user_type" = "member_casual")
+
+```
+####  Convert started_at and ended_at to dttm 
+
+```{r}
+all_data<-mutate(all_data,started_at=ymd_hms(started_at),
+                          ended_at =ymd_hms(ended_at))
+```
+
+#### Adding Columns
+```{r}
+all_data$ride_length<-difftime(all_data$ended_at,all_data$started_at)
+all_data$date <- as.Date(all_data$started_at) #The default format is yyyy-mm-dd
+all_data$month <- format(as.Date(all_data$date), "%b")
+all_data$day <- format(as.Date(all_data$date), "%d")
+all_data$year <- format(as.Date(all_data$date), "%Y")
+all_data$day_of_week <- format(as.Date(all_data$date), "%A")
+```
+
+#### Changing the Data Type of ride_length to numeric for ease of calculation of data
+```{r}
+all_data$date <- as.numeric(all_data$ride_length)
+```
+
+### Clean Data
+#### remove duplicate rows
+```{r}
+all_data <- distinct(all_data)
+```
+
+
+#### remove rows with null values
+```{r}
+all_data <- na.omit(all_data)
+```
+
+* Negative ride_length values and outliers
+* ride_length values that are negative are not correct as the difference between end time and start time has to be a positive value.
+* If the ride_length values are less than 60 seconds or more than 86,400 seconds (24 hours), then they will be considered outliers as mentioned in the Website.
+ 
+```{r}
+all_clean_data <- filter(all_data, !(ride_length<60), !(ride_length>86400))
+```
+
+```{r}
+min(all_clean_data$ride_length)
+```
+ 
+```{r}
+max(all_clean_data$ride_length)
+```
+ 
+#### Checking the changes that we made to our Data
+```{r}
+skim_without_charts(all_clean_data)
+```
+
+```{r}
+colnames(all_clean_data)
+```
+
+```{r}
+summary(all_clean_data)
+```
+
+```{r}
+sample_n(all_clean_data,50)
+```
+
+Save data after cleaning
+
+```{r}
+# write.csv(all_clean_data, file = "Data_after_cleaning.csv", row.names = FALSE)
+```
+
+### Step 4 : Analyzing and Visualising the Data
+
+* Descriptive Analysis
+
+```{r}
+
+summary(all_clean_data$ride_length)
+```
+* Average ride_length of all rides is 905.5 secs (~15 mins)
+
+* Minimum ride_length of all rides is 60 secs (1 min)
+
+* Maximum ride_length of all rides is 86146 secs (~24 hrs)
+
+#### Data for Average ride_length by user_type
+
+```{r}
+all_clean_data%>% 
+  group_by(user_type) %>% 
+  summarise(average_ride_length = mean(ride_length))
+```
+* Average Ride Length  
+  + **Member** 12.04 minutes  
+  + **Casual** 20.84 minutes
+
+#### Visualizing Average ride_length
+```{r}
+all_clean_data %>% 
+  group_by(user_type) %>% 
+  summarise(average_ride_length = mean(ride_length)) %>% 
+  ggplot() + geom_bar(mapping = aes(x = user_type, y = average_ride_length, fill = user_type), stat = 'identity', width = 0.3) + labs(title = "Average ride length for each user type", x = "User Type", y = "Average Ride Length") + scale_fill_manual(values = c("#d37a1c", "#023a3a"))
+```
+#### Key Insights
+* Average ride_length or ride time of casual rides is 1250.63 secs(~21 mins.) while that of member rides is 724.2051  secs (12 mins.)
+
+#### Total Number of Rides by User Type and Type of the bike
+```{r}
+all_clean_data %>% 
+  group_by(user_type, rideable_type) %>% 
+  summarise(number_of_rides = n())
+```
+```{r}
+all_clean_data %>% 
+  group_by(user_type, rideable_type) %>% 
+  summarise(number_of_rides = n()) %>% 
+  ggplot() + geom_bar(mapping = aes(x=user_type, y=number_of_rides, fill=rideable_type), stat='identity', width = 0.3) + labs(title = "Total number of rides by user type and type of bike", x="User type", y="Number of rides") 
+```
+```{r}
+all_clean_data %>%
+  group_by(rideable_type,user_type) %>%
+  dplyr::summarize(count_trips = n()) %>%  
+  ggplot(aes(x=rideable_type, y=count_trips, fill=user_type, color=user_type)) +
+  geom_bar(stat='identity', position='dodge') +
+  theme_bw()+
+  labs(title="Number of Trips by Bicycle Type", x="Bicycle Type", y="Number of Rides")
+```
+
+
+Key Insights
+* Docked bike is not used by anyone who is a member and is not that popular as an option among casual riders as well.
+* Classic and electric bike are a popular choice among casual as well as member riders.
+
+
+#### Total number of riders for each user type by months
+
+```{r}
+all_clean_data %>% 
+  group_by(user_type, month) %>% 
+  summarise(number_of_rides = n()) %>% 
+  arrange(user_type)
+```
+
+
+```{r}
+all_clean_data <- all_clean_data %>%
+  mutate(month =factor(month, levels = c( "Jan", "Feb", "Mar","Apr", "May", "Jun")))
+all_clean_data %>% 
+  group_by(user_type, month) %>% 
+  summarise(number_of_rides = n()) %>% 
+  ggplot(aes(x=month, y=number_of_rides, group=user_type, color=user_type)) + geom_line(size=1.1) + geom_point(size=2.2)+ labs(title = "Number of monthly rides for each user type", x="Month", y="Number of rides") + scale_color_manual(values = c("#d37a1c", "#023a3a"))
+```
+#### Total number of riders for each user type by Days
+```{r}
+all_clean_data %>% 
+  group_by(user_type, day_of_week) %>% 
+  summarise(number_of_rides = n()) %>% 
+  arrange(user_type)
+```
+
+```{r}
+all_clean_data %>% 
+  group_by(user_type, day_of_week) %>% 
+  summarise(number_of_rides = n()) %>% 
+  ggplot() + geom_col(mapping = aes(x=day_of_week, y=number_of_rides, fill=user_type), position = "dodge") +
+  labs(title = "Number of rides for each user type by weekday", x="Day of Week", y="Number of rides") 
+```
+Key Insights
+* The number of Member riders are maximum on on Thursday, Tuesday and Wednesday.
+* The number of Casual riders are almost constant throughout the week.
+
+#### Find popular start station for member riders
+
+```{r}
+all_clean_data %>%
+  group_by(user_type,start_station_name) %>%
+  dplyr::summarise(number_of_rides = n()) %>%
+  filter(start_station_name != "", "member" == user_type) %>%
+  arrange(-number_of_rides) %>%
+  head(n=5)
+```
+
+```{r}
+
+#Find popular start station for member riders
+all_clean_data %>%
+  group_by(user_type,start_station_name) %>%
+  dplyr::summarise(number_of_rides = n()) %>%
+  filter(start_station_name != "", "member" == user_type) %>%
+  arrange(-number_of_rides) %>%
+  head(n=5)  %>% 
+  mutate(start_station_name= fct_reorder(start_station_name, number_of_rides)) %>% 
+  ggplot() + geom_bar(mapping = aes(x=start_station_name, y=number_of_rides, fill=number_of_rides), stat = 'identity') + coord_flip() + labs(title = "Top 5 ride starting stations for member rides", x="Start Station Name", y="Number of rides") 
+  
+
+```
+
+#### Find popular start station for casual riders
+
+```{r}
+all_clean_data %>%
+  group_by(user_type,start_station_name) %>%
+  dplyr::summarise(number_of_rides = n()) %>%
+  filter(start_station_name != "", "casual" == user_type) %>%
+  arrange(-number_of_rides) %>%
+  head(n=5)
+
+```
+```{r}
+all_clean_data %>%
+  group_by(user_type,start_station_name) %>%
+  dplyr::summarise(number_of_rides = n()) %>%
+  filter(start_station_name != "", "casual" == user_type) %>%
+  arrange(-number_of_rides) %>%
+  head(n=5)  %>% 
+  mutate(start_station_name= fct_reorder(start_station_name, number_of_rides)) %>% 
+  ggplot() + geom_bar(mapping = aes(x=start_station_name, y=number_of_rides, fill=number_of_rides), stat = 'identity') + coord_flip() + labs(title = "Top 5 ride starting stations for casual rides", x="Start Station Name", y="Number of rides") 
+
+```
+
+#### Find popular end station for member riders
+
+```{r}
+all_clean_data %>%
+  group_by(user_type,end_station_name) %>%
+  dplyr::summarise(number_of_rides = n()) %>%
+  filter(end_station_name != "", "member" == user_type) %>%
+  arrange(-number_of_rides) %>%
+  head(n=5)
+```
+
+```{r}
+all_clean_data %>%
+  group_by(user_type,end_station_name) %>%
+  dplyr::summarise(number_of_rides = n()) %>%
+  filter(end_station_name != "", "member" == user_type) %>%
+  arrange(-number_of_rides) %>%
+  head(n=5)  %>% 
+  mutate(end_station_name= fct_reorder(end_station_name, number_of_rides)) %>% 
+  ggplot() + geom_bar(mapping = aes(x=end_station_name, y=number_of_rides, fill=number_of_rides), stat = 'identity') + coord_flip() + labs(title = "Top 5 ride End stations for member rides", x="End Station Name", y="Number of rides") 
+  
+```
+
+
+```{r}
+all_clean_data %>%
+  group_by(user_type,end_station_name) %>%
+  dplyr::summarise(number_of_rides = n()) %>%
+  filter(end_station_name != "", "casual" == user_type) %>%
+  arrange(-number_of_rides) %>%
+  head(n=5)
+```
+
+
+```{r}
+all_clean_data %>%
+  group_by(user_type,end_station_name) %>%
+  dplyr::summarise(number_of_rides = n()) %>%
+  filter(end_station_name != "", "casual" == user_type) %>%
+  arrange(-number_of_rides) %>%
+  head(n=5)  %>% 
+  mutate(end_station_name= fct_reorder(end_station_name, number_of_rides)) %>% 
+  ggplot() + geom_bar(mapping = aes(x=end_station_name, y=number_of_rides, fill=number_of_rides), stat = 'identity') + coord_flip() + labs(title = "Top 5 ride End stations for casual rides", x="End Station Name", y="Number of rides") 
+```
+
+### EXPORT SUMMARY FILE FOR FURTHER ANALYSIS
+
+```{r}
+# write.csv(all_clean_data, file = "yearly_trips_report.csv")
+```
+
+### Step 6 : Act
+
+#### Conclusions from the analysis
+* 1-The average ride length for casual rides is 20 minutes which is more than  member rides - 12 minutes.
+* 2-Analysis based on Months :
+     * For Casual riders the highest number of rides are in the months of May and Jun. The months with the lowest number of rides are               January and February.
+     * For Member riders the highest number of rides are in the months of May and Jun. The months with the lowest number of rides are               January and February.
+* 3-Analysis based on Days :
+     * Member rides are highest on Thursday, Tuesday and Wednesday.
+     * Casual rides are lowest on Monday and Tuesday.
+
+* 4-Analysis based on Location :
+    * The top 5 ride starting stations for Member users are- Kingsbury St & Kinzie St,Clinton St & Washington Blvd, Clark St & Elm St,            University Ave & 57th St, Ellis Ave & 60th St.
+    * The top 5 ride starting stations for Casual users are- Streeter Dr & Grand Ave,DuSable Lake Shore Dr & Monroe St,Michigan Ave & Oak         St,Millennium Park, DuSable Lake Shore Dr & North Blvd.
+    * The top 5 ride Ending stations for Member users are-Clinton St & Washington Blvd,Kingsbury St & Kinzie St,	University Ave & 57th St,          Clark St & Elm St, Wells St & Concord Ln.
+    * The top 5 ride Ending stations for Casual users are- Streeter Dr & Grand Ave,	DuSable Lake Shore Dr & Monroe St, Michigan Ave & Oak            St,	Millennium Park, DuSable Lake Shore Dr & North Blvd
+    
+#### Conclusions 
+* Casual riders take less trips/rides but for longer durations of time vs members
+
+### Recommendations
+#### Members and casual riders differ in how long they use the bikes and how often they use the bikes. In order to get more casual riders to    buy a membership my top recommendations are:
+* Give discounts for longer rides when you have a membership
+* Longer rides can get some type of rewards program when they become members
+
+
+
